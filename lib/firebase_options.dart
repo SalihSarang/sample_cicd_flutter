@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1050744471374',
     projectId: 'cicd-66360',
     storageBucket: 'cicd-66360.firebasestorage.app',
+    androidClientId: '1050744471374-tldmol6ubk6lm4ihd3otol57bfece4bj.apps.googleusercontent.com',
+    iosClientId: '1050744471374-qmh7m0h1hp0si1vnknlmgnne90fjvlpg.apps.googleusercontent.com',
     iosBundleId: 'com.example.week28',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1050744471374',
     projectId: 'cicd-66360',
     storageBucket: 'cicd-66360.firebasestorage.app',
+    androidClientId: '1050744471374-tldmol6ubk6lm4ihd3otol57bfece4bj.apps.googleusercontent.com',
+    iosClientId: '1050744471374-qmh7m0h1hp0si1vnknlmgnne90fjvlpg.apps.googleusercontent.com',
     iosBundleId: 'com.example.week28',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'cicd-66360.firebasestorage.app',
     measurementId: 'G-0V7HJJZR31',
   );
+
 }

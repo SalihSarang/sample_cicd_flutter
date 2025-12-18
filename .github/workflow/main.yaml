@@ -31,7 +31,7 @@ jobs:
       - name: Run Tests
         run: flutter test --coverage
 
-      - name: Build APK
-        run: flutter build appbundle --release
+      # - name: Build APK
+      #   run: flutter build appbundle --release
 
       
