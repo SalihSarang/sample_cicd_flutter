@@ -14,9 +14,11 @@ final class AuthLoading extends AuthState {}
 final class AuthUnauthenticated extends AuthState {}
 
 final class AuthSuccess extends AuthState {
-  // You might want to pass the UserEntity here
-  // final UserEntity user;
-  // const AuthSuccess(this.user);
+  final UserEntity user;
+  const AuthSuccess(this.user);
+
+  @override
+  List<Object> get props => [user];
 }
 
 final class AuthFailure extends AuthState {

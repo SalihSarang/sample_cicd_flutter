@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:week_28/init_dependencies.dart';
 import 'package:week_28/features/google_auth/presentation/bloc/auth_bloc.dart';
 import 'package:week_28/features/todo/presentation/bloc/todo_bloc.dart';
-import 'package:week_28/features/todo/presentation/bloc/todo_event.dart';
 import 'package:week_28/features/splash_screen/presentation/screens/splash_screen.dart';
 import 'package:week_28/core/theme/app_theme.dart';
 
@@ -17,9 +16,7 @@ Future<void> main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => serviceLocator<AuthBloc>()),
-        BlocProvider(
-          create: (_) => serviceLocator<TodoBloc>()..add(LoadTodos()),
-        ),
+        BlocProvider(create: (_) => serviceLocator<TodoBloc>()),
       ],
       child: const MyApp(),
     ),

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:week_28/features/google_auth/domain/models/user_entity.dart';
 import 'package:week_28/features/google_auth/domain/usecases/sign_in_with_google.dart';
 import 'package:week_28/features/google_auth/domain/usecases/get_current_user.dart';
 import 'package:week_28/features/google_auth/domain/usecases/sign_out.dart';
@@ -35,8 +36,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  // ... (existing helper methods)
-
   Future<void> _onAuthCheckStatus(
     AuthCheckStatus event,
     Emitter<AuthState> emit,
@@ -45,7 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _getCurrentUser();
       if (user != null) {
-        emit(AuthSuccess());
+        emit(AuthSuccess(user));
       } else {
         emit(AuthUnauthenticated());
       }
@@ -60,9 +59,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      await _signInWithGoogle();
-
-      emit(AuthSuccess());
+      final user = await _signInWithGoogle();
+      emit(AuthSuccess(user));
     } catch (e) {
       emit(AuthFailure(e.toString()));
     }

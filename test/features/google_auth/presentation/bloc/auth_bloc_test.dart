@@ -30,13 +30,13 @@ void main() {
 
   group('AuthSignInWithGoogle', () {
     blocTest<AuthBloc, AuthState>(
-      'emits [AuthLoading, AuthSuccess] when successful',
+      'emits [AuthLoading, AuthSuccess(tUser)] when successful',
       build: () {
         when(() => mockSignInWithGoogle()).thenAnswer((_) async => tUser);
         return authBloc;
       },
       act: (bloc) => bloc.add(AuthSignInWithGoogle()),
-      expect: () => [AuthLoading(), AuthSuccess()],
+      expect: () => [AuthLoading(), const AuthSuccess(tUser)],
     );
 
     blocTest<AuthBloc, AuthState>(
@@ -46,19 +46,19 @@ void main() {
         return authBloc;
       },
       act: (bloc) => bloc.add(AuthSignInWithGoogle()),
-      expect: () => [AuthLoading(), AuthFailure('Exception: Failed')],
+      expect: () => [AuthLoading(), const AuthFailure('Exception: Failed')],
     );
   });
 
   group('AuthCheckStatus', () {
     blocTest<AuthBloc, AuthState>(
-      'emits [AuthLoading, AuthSuccess] when user is present',
+      'emits [AuthLoading, AuthSuccess(tUser)] when user is present',
       build: () {
         when(() => mockGetCurrentUser()).thenAnswer((_) async => tUser);
         return authBloc;
       },
       act: (bloc) => bloc.add(AuthCheckStatus()),
-      expect: () => [AuthLoading(), AuthSuccess()],
+      expect: () => [AuthLoading(), const AuthSuccess(tUser)],
     );
 
     blocTest<AuthBloc, AuthState>(
@@ -90,7 +90,7 @@ void main() {
         return authBloc;
       },
       act: (bloc) => bloc.add(AuthSignOut()),
-      expect: () => [AuthLoading(), AuthFailure('Exception: Failed')],
+      expect: () => [AuthLoading(), const AuthFailure('Exception: Failed')],
     );
   });
 }
