@@ -21,9 +21,6 @@ jobs:
           channel: 'stable'
           flutter-version: '3.19.0'
 
-      - name: Flutter Clean
-        run: flutter clean
-
       - name: Install Dependencies
         run: flutter pub get
 
