@@ -83,8 +83,7 @@ class FirebaseAuthDataSource {
   Future<UserEntity?> getCurrentUser() async {
     final user = auth.currentUser;
     if (user != null) {
-      // Ensure user is in Firestore even if they were already logged in
-      await _saveUserToFirestore(user);
+      _saveUserToFirestore(user);
     }
     return user?.toEntity();
   }

@@ -25,7 +25,7 @@ Future<void> initDependencies() async {
   _initTodo();
 }
 
-void _initAuth() {
+void _initAuth() { 
   // External
   serviceLocator.registerLazySingleton(() => FirebaseAuth.instance);
   serviceLocator.registerLazySingleton(() => FirebaseFirestore.instance);

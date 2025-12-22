@@ -1,7 +1,9 @@
 name: Flutter CI Pipeline
 
-on: 
+on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 jobs:
@@ -10,28 +12,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - names: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.x'
           channel: 'stable'
+          flutter-version: '3.10.1'
 
       - name: Install Dependencies
         run: flutter pub get
-
-      - name: Run Flutter Tests
-        run: flutter Test
 
       - name: Analyze code
         run: flutter analyze
 
       - name: Run Tests
-        run: flutter test --coverage
-
-      # - name: Build APK
-      #   run: flutter build appbundle --release
-
-      
+        run: flutter test
