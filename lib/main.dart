@@ -8,6 +8,8 @@ import 'package:week_28/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:week_28/features/splash_screen/presentation/screens/splash_screen.dart';
 import 'package:week_28/core/theme/app_theme.dart';
 
+// Testing CI/CD 4
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
