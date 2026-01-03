@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:401762111130:android:03b4a440ae79e8d1bb1923",
         "android_client_info": {
-          "package_name": "com.test.todo_app"
+          "package_name": "com.sarang.todo_app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "401762111130-8b52kearsmik8nm55qp1b0u3bjcgq5nv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.test.todo_app",
+            "package_name": "com.sarang.todo_app",
             "certificate_hash": "d8e5c34ffabebacdedc1801d43af1787e6d0c5a9"
           }
         },
@@ -42,7 +42,7 @@
               "client_id": "401762111130-gr7fkr90qpb607uq2qlnbuftu1a6na2o.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.week28"
+                "bundle_id": "com.sarang.week28"
               }
             }
           ]
