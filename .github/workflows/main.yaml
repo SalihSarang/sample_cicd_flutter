@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   build:
-    stratergy:
+    strategy:
       matrix: 
         include:
           - platform: android
