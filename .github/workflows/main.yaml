@@ -15,15 +15,15 @@ jobs:
             os: ubuntu-latest
             command: flutter build web
 
-  runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
-  steps:
-    - uses: actions/checkout@v4
-    - uses:  subosito/flutter-action@v2
-      with: 
-        channel: stable
+    steps:
+      - uses: actions/checkout@v4
+      - uses:  subosito/flutter-action@v2
+        with: 
+          channel: stable
 
-    - run: flutter pub get
+      - run: flutter pub get
 
-    - name: Build ${{ matrix.platform }}
-      run: ${{ matrix.command }}
+      - name: Build ${{ matrix.platform }}
+        run: ${{ matrix.command }}
