@@ -9,14 +9,14 @@ jobs:
       matrix: 
         include:
           - platform: ios
-            os: ubuntu-latest
-            command: flutter build ios --no-codesign
+            os: macos-latest
+            cmd: flutter build ios --no-codesign
           - platform: web
             os: ubuntu-latest
-            command: flutter build web
+            cmd: flutter build web
           - platform: android
             os: ubuntu-latest
-            command: flutter build apk --release
+            cmd: flutter build apk --release
 
     runs-on: ${{ matrix.os }}
 
@@ -31,4 +31,4 @@ jobs:
       - run: flutter test
 
       - name: Build ${{ matrix.platform }}
-        run: ${{ matrix.command }}
+        run: ${{ matrix.cmd }}
