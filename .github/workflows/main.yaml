@@ -26,6 +26,16 @@ jobs:
         with: 
           channel: stable
 
+      - name: Create key.properties
+        if: matrix.platform == 'android'
+        run: |
+          echo "${{ secrets.KEY_PROPERTIES }}" > android/key.properties
+
+      - name: Decode Keystore
+        if: matrix.platform == 'android'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
