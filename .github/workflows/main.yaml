@@ -8,12 +8,15 @@ jobs:
     strategy:
       matrix: 
         include:
-          - platform: android
+          - platform: ios
             os: ubuntu-latest
-            command: flutter build apk --debug 
+            command: flutter build ios --no-codesign
           - platform: web
             os: ubuntu-latest
             command: flutter build web
+          - platform: android
+            os: ubuntu-latest
+            command: flutter build apk --release
 
     runs-on: ${{ matrix.os }}
 
