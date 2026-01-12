@@ -78,28 +78,21 @@ android {
                 storeFile = file(storeFileStr)
                 storePassword = storePasswordStr
             } else {
-                // Log missing keys for debugging (without revealing secrets)
-                if (keystoreProperties.isEmpty) {
-                    println("RELEASE SIGNING: Properties file is empty or not loaded.")
-                } else {
-                   println("RELEASE SIGNING: Missing specific keys.")
-                   if (keyAliasStr == null) println("  - keyAlias is missing")
-                   if (keyPasswordStr == null) println("  - keyPassword is missing")
-                   if (storeFileStr == null) println("  - storeFile is missing")
-                   if (storePasswordStr == null) println("  - storePassword is missing")
-                }
-                // Don't throw exception yet, to allow debug builds to proceed? 
-                // But this is 'release' config.
-                // If we are building release, we need this.
-                // However, 'create("release")' is executed during configuration phase.
-                // We shouldn't crash just because it's configured, only if used.
+                 println("RELEASE SIGNING: Secrets not available. This build will not be signed with the release key.")
             }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Only apply signing config if it's fully configured
+            val releaseConfig = signingConfigs.getByName("release")
+            if (releaseConfig.storeFile != null) {
+                signingConfig = releaseConfig
+            } else {
+                println("RELEASE SIGNING: Skipping signing configuration (missing keys).")
+            }
+            
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
