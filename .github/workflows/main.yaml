@@ -34,14 +34,36 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 secret is not set!"
+            exit 1
+          fi
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          
+          if [ ! -s android/app/upload-keystore.jks ]; then
+             echo "::error::android/app/upload-keystore.jks is empty after decoding!"
+             exit 1
+          fi
 
       - name: Decode Android key.properties
         if: matrix.platform == 'android'
         env:
           ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
         run: |
+          if [ -z "$ANDROID_KEY_PROPERTIES" ]; then
+            echo "::error::ANDROID_KEY_PROPERTIES secret is not set!"
+            exit 1
+          fi
+          
           echo "$ANDROID_KEY_PROPERTIES" | base64 --decode > android/key.properties
+          
+          if [ ! -s android/key.properties ]; then
+            echo "::error::android/key.properties is empty after decoding. Check if the secret is valid base64."
+            exit 1
+          fi
+          
+          echo "android/key.properties generated successfully. Size: $(wc -c < android/key.properties) bytes."
+
           # Ensure storeFile points to the decoded keystore in android/app/upload-keystore.jks
           # Since build.gradle is in android/app/, formatting strictly as filename works if file() is relative to project (app) dir
           # Assuming android/key.properties is used by android/app/build.gradle
