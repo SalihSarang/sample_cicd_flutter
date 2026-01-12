@@ -44,6 +44,9 @@ jobs:
           echo "$ANDROID_KEY_PROPERTIES" | base64 --decode > android/key.properties
           # Ensure storeFile points to the decoded keystore in android/app/upload-keystore.jks
           sed -i 's|^storeFile=.*|storeFile=upload-keystore.jks|' android/key.properties
+          
+          echo "Listing android directory:"
+          ls -R android
 
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.cmd }}

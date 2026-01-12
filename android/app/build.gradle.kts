@@ -8,15 +8,33 @@ plugins {
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
-    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
+var keystorePropertiesFile = rootProject.file("key.properties")
+
+// Fallback mechanism to find key.properties if rootProject resolution fails
+if (!keystorePropertiesFile.exists()) {
+    // Try explicit path assuming we are in android/app and key.properties is in android/
+    val altFile = file("../key.properties")
+    if (altFile.exists()) {
+        keystorePropertiesFile = altFile
+        println("RELEASE SIGNING: Found key.properties at relative path: " + altFile.absolutePath)
+    } else {
+        println("RELEASE SIGNING: Could not find key.properties at " + keystorePropertiesFile.absolutePath + " or " + altFile.absolutePath)
+    }
+} else {
+     println("RELEASE SIGNING: Found key.properties at " + keystorePropertiesFile.absolutePath)
+}
+
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    try {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    } catch (e: Exception) {
+        println("RELEASE SIGNING: Failed to load properties: " + e.message)
+    }
 }
 
 
@@ -30,8 +48,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
     }
 
     defaultConfig {
