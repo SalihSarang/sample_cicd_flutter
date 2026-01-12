@@ -44,6 +44,11 @@ jobs:
           ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
         run: |
           echo "$ANDROID_KEY_PROPERTIES" | base64 --decode > android/key.properties
+          # Ensure storeFile points to the decoded keystore in android/app/upload-keystore.jks
+          # Since build.gradle is in android/app/, formatting strictly as filename works if file() is relative to project (app) dir
+          # Assuming android/key.properties is used by android/app/build.gradle
+          sed -i 's|^storeFile=.*|storeFile=upload-keystore.jks|' android/key.properties
+
 
       # Decode iOS secrets
       - name: Decode iOS GoogleService-Info.plist
