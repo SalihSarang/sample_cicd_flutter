@@ -12,7 +12,9 @@ jobs:
           - platform: web
             os: ubuntu-latest
             cmd: flutter build web
-
+          - platform: android
+            os: ubuntu-latest
+            cmd: flutter build appbundle --release
 
     runs-on: ${{ matrix.os }}
 
@@ -26,9 +28,22 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+      # Decode Android secrets
+      - name: Decode Android Keystore
+        if: matrix.platform == 'android'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
 
-
-
+      - name: Decode Android key.properties
+        if: matrix.platform == 'android'
+        env:
+          ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
+        run: |
+          echo "$ANDROID_KEY_PROPERTIES" | base64 --decode > android/key.properties
+          # Ensure storeFile points to the decoded keystore in android/app/upload-keystore.jks
+          sed -i 's|^storeFile=.*|storeFile=upload-keystore.jks|' android/key.properties
 
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.cmd }}
