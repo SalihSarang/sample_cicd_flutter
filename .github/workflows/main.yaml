@@ -3,12 +3,10 @@ name: Flutter Matrix Build
 on: [push, pull_request]
 
 jobs:
-
   build:
     strategy:
       matrix: 
         include:
-
           - platform: web
             os: ubuntu-latest
             cmd: flutter build web
@@ -17,9 +15,11 @@ jobs:
             cmd: flutter build appbundle --release
 
     runs-on: ${{ matrix.os }}
+    
     steps:
       - uses: actions/checkout@v4
-      - uses:  subosito/flutter-action@v2
+      
+      - uses: subosito/flutter-action@v2
         with: 
           channel: stable
 
@@ -27,18 +27,24 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+      # FIX 1: Save the file inside the 'android' folder so Gradle can find it
       - name: Decode keystore
         if: matrix.platform == 'android'
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
         
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.cmd }}
         env:
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          KEYSTORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          STORE_PATH: upload-keystore.jks 
-
+          # FIX 2: Use the exact names from your Secrets screenshot
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          
+          # FIX 3: Use 'STORE_PASSWORD' (This is what Gradle looks for)
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          
+          # FIX 4: Use 'STORE_FILE' (This is what Gradle looks for)
+          STORE_FILE: upload-keystore.jks 
+          
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -46,6 +52,3 @@ jobs:
           path: |
             build/app/outputs/bundle/release/app-release.aab
             build/web
-
-
-      
