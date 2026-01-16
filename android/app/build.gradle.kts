@@ -45,10 +45,28 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String
+            // Try to get secrets from key.properties, otherwise fallback to Environment Variables
+            val keystoreAlias = (keystoreProperties["keyAlias"] as? String) 
+                ?: System.getenv("KEY_ALIAS")
+            
+            val keystorePass = (keystoreProperties["keyPassword"] as? String) 
+                ?: System.getenv("KEY_PASSWORD")
+            
+            val keystoreFile = (keystoreProperties["storeFile"] as? String) 
+                ?: System.getenv("STORE_FILE")
+            
+            val keystoreStorePass = (keystoreProperties["storePassword"] as? String) 
+                ?: System.getenv("STORE_PASSWORD")
+
+            // Only configure signing if we found the credentials
+            if (keystoreAlias != null && keystorePass != null && keystoreFile != null && keystoreStorePass != null) {
+                keyAlias = keystoreAlias
+                keyPassword = keystorePass
+                storeFile = file(keystoreFile)
+                storePassword = keystoreStorePass
+            } else {
+                println("Release signing configuration not found. Skipping signing.")
+            }
         }
     }
 
