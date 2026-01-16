@@ -27,5 +27,24 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+      - name: Decode keystore
+        if: matrix.platform == 'android'
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
+        
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.cmd }}
+        env:
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          STORE_PATH: upload-keystore.jks 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/web
+
+
+      
