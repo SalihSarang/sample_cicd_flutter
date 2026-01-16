@@ -1,15 +1,12 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-
-
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // REMOVED: id("kotlin-android") <- This plugin is removed for AGP 9+ migration
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -45,34 +42,34 @@ android {
 
     signingConfigs {
         create("release") {
-            // Try to get secrets from key.properties, otherwise fallback to Environment Variables
             val keystoreAlias = (keystoreProperties["keyAlias"] as? String) 
                 ?: System.getenv("KEY_ALIAS")
-            
             val keystorePass = (keystoreProperties["keyPassword"] as? String) 
                 ?: System.getenv("KEY_PASSWORD")
-            
             val keystoreFile = (keystoreProperties["storeFile"] as? String) 
                 ?: System.getenv("STORE_FILE")
-            
             val keystoreStorePass = (keystoreProperties["storePassword"] as? String) 
                 ?: System.getenv("STORE_PASSWORD")
 
-            // Only configure signing if we found the credentials
             if (keystoreAlias != null && keystorePass != null && keystoreFile != null && keystoreStorePass != null) {
                 keyAlias = keystoreAlias
                 keyPassword = keystorePass
-                storeFile = file(keystoreFile)
+                storeFile = if (keystoreFile.startsWith("/")) file(keystoreFile) else rootProject.file(keystoreFile)
                 storePassword = keystoreStorePass
             } else {
-                println("Release signing configuration not found. Skipping signing.")
+                println("Release signing configuration not found. Release build will NOT be signed.")
             }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // FIX: Only apply the signing config if the storeFile is actually set.
+            // This prevents the NullPointerException when keys are missing.
+            val config = signingConfigs.getByName("release")
+            if (config.storeFile != null) {
+                signingConfig = config
+            }
         }
     }
 }
