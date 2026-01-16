@@ -6,7 +6,7 @@ plugins {
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
-    // REMOVED: id("kotlin-android") <- This plugin is removed for AGP 9+ migration
+    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
