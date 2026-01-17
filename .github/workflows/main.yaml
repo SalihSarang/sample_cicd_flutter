@@ -27,7 +27,6 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
-      # FIX 1: Save the file inside the 'android' folder so Gradle can find it
       - name: Decode keystore
         if: matrix.platform == 'android'
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
@@ -35,14 +34,9 @@ jobs:
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.cmd }}
         env:
-          # FIX 2: Use the exact names from your Secrets screenshot
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          
-          # FIX 3: Use 'STORE_PASSWORD' (This is what Gradle looks for)
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}          
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          
-          # FIX 4: Use 'STORE_FILE' (This is what Gradle looks for)
           STORE_FILE: upload-keystore.jks 
           
       - name: Upload Artifacts
