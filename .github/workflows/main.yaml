@@ -1,69 +1,79 @@
-name: Flutter Matrix Build
+name: Flutter Android CI/CD
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
 
 jobs:
-  build:
-    strategy:
-      matrix: 
-        include:
-          - platform: web
-            os: ubuntu-latest
-            cmd: flutter build web
-          - platform: android
-            os: ubuntu-latest
-            cmd: flutter build appbundle --release
+  build_android:
+    name: Build Android AppBundle
+    runs-on: ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
-    
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: subosito/flutter-action@v2
-        with: 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
           channel: stable
+          cache: true
 
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Decode keystore
-        if: matrix.platform == 'android'
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-        
-      - name: Build ${{ matrix.platform }}
-        run: ${{ matrix.cmd }}
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Decode Android keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      - name: Build AppBundle
+        run: flutter build appbundle --release
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}          
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          STORE_FILE: upload-keystore.jks 
-          
-      - name: Upload Artifacts
+          STORE_FILE: upload-keystore.jks
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p out
+          cp build/app/outputs/bundle/release/app-release.aab out/
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ matrix.platform }}
-          path: |
-            build/app/outputs/bundle/release/app-release.aab
-            build/web
+          name: release-android
+          path: out/app-release.aab
+          if-no-files-found: error
 
   deploy_android:
-    name: Deploy Android to Play Store
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Deploy to Google Play
+    needs: build_android
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+
     steps:
-      - name: Download Artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: release-android
-          path: release-android 
+          path: release-android
 
-      - name: Deploy to Play Store
+      - name: Verify artifact
+        run: ls -R release-android
+
+      - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          releaseFiles: release-android/app-release.aab
           packageName: com.salih.cicdSample
+          releaseFiles: release-android/app-release.aab
           track: internal
           status: completed
