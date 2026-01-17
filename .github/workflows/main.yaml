@@ -76,4 +76,4 @@ jobs:
           packageName: com.salih.cicdSample
           releaseFiles: release-android/app-release.aab
           track: internal
-          status: completed
+          status: draft
