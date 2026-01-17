@@ -46,3 +46,22 @@ jobs:
           path: |
             build/app/outputs/bundle/release/app-release.aab
             build/web
+
+  deploy_android:
+    name: Deploy Android to Play Store
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-android
+      
+      - name: Deploy to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT }}
+          releaseFile: app-release.aab
+          track: internal
+          status: completed
