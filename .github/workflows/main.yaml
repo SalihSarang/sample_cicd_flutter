@@ -1,4 +1,4 @@
-name: Flutter Android CI/CD
+name: Flutter CI/CD (Android + Web)
 
 on:
   push:
@@ -6,9 +6,20 @@ on:
   pull_request:
 
 jobs:
-  build_android:
-    name: Build Android AppBundle
-    runs-on: ubuntu-latest
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - platform: web
+            os: ubuntu-latest
+            cmd: flutter build web
+
+          - platform: android
+            os: ubuntu-latest
+            cmd: flutter build appbundle --release
 
     steps:
       - name: Checkout code
@@ -30,28 +41,26 @@ jobs:
         run: flutter test
 
       - name: Decode Android keystore
+        if: matrix.platform == 'android'
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
 
-      - name: Build AppBundle
-        run: flutter build appbundle --release
+      - name: Build
+        run: ${{ matrix.cmd }}
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           STORE_FILE: upload-keystore.jks
 
-      - name: Prepare artifact
-        run: |
-          mkdir -p out
-          cp build/app/outputs/bundle/release/app-release.aab out/
-
-      - name: Upload artifact
+      - name: Upload Android artifact
+        if: matrix.platform == 'android'
         uses: actions/upload-artifact@v4
         with:
-          name: release-android
-          path: out/app-release.aab
+          name: android-release
+          path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
+
 
   deploy_android:
     name: Deploy to Google Play
