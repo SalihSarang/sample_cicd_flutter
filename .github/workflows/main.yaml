@@ -61,8 +61,10 @@ jobs:
       - name: Deploy to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonRaw: ${{ secrets.SERVICE_ACCOUNT_JSON }} 
+          # FIX 1: Change 'serviceAccountJsonRaw' to 'serviceAccountJsonPlainText'
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           
+          # FIX 2: Point to the folder created by 'download-artifact@v4'
           releaseFiles: release-android/app-release.aab
           
           packageName: com.salih.cicdSample
