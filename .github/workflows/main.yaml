@@ -6,9 +6,22 @@ on:
   pull_request:
 
 jobs:
-  build_android:
-    name: Build Android AppBundle
+  build:
+    name: Build (${{ matrix.platform }})
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - platform: android
+            flutter_build: flutter build appbundle --release
+            artifact_path: build/app/outputs/bundle/release/app-release.aab
+            artifact_name: release-android
+
+          - platform: web
+            flutter_build: flutter build web --release
+            artifact_path: build/web
+            artifact_name: release-web
 
     steps:
       - name: Checkout code
@@ -29,36 +42,43 @@ jobs:
       - name: Test
         run: flutter test
 
+      # 🔐 Android-only keystore step
       - name: Decode Android keystore
+        if: matrix.platform == 'android'
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-      - name: Build AppBundle
-        run: flutter build appbundle --release
+
+      # 🏗 Build (Android or Web)
+      - name: Build
+        run: ${{ matrix.flutter_build }}
         env:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           STORE_FILE: upload-keystore.jks
 
+      # 📦 Prepare artifact
       - name: Prepare artifact
         run: |
           mkdir -p out
-          cp build/app/outputs/bundle/release/app-release.aab out/
+          cp -r ${{ matrix.artifact_path }} out/
+
+      # ⬆ Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-android
-          path: out/app-release.aab
+          name: ${{ matrix.artifact_name }}
+          path: out
           if-no-files-found: error
 
   deploy_android:
     name: Deploy to Google Play
-    needs: build_android
+    needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifact
+      - name: Download Android artifact
         uses: actions/download-artifact@v4
         with:
           name: release-android
