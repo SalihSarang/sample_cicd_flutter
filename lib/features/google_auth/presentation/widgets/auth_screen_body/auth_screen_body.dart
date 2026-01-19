@@ -21,6 +21,7 @@ class AuthScreenBody extends StatelessWidget {
           Center(child: LoginButton()),
           GoogleSignInText(),
           Spacer(),
+          Text('V 1.0.3+5')
         ],
       ),
     );
