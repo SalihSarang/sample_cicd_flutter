@@ -1,4 +1,4 @@
-name: Flutter Android CI/CD
+name: Flutter CI/CD
 
 on:
   push:

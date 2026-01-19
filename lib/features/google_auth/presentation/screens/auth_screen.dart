@@ -16,6 +16,8 @@ class AuthScreen extends StatelessWidget {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
+            debugPrint('Auth screen');
+
             SnackbarUtils.showSnackBar(context, state.message);
           }
           if (state is AuthSuccess) {
